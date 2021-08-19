@@ -21,7 +21,8 @@ mongo = PyMongo(app)
 @app.route("/")
 @app.route("/get_tasks")
 def get_tasks():
-    # wrapping find method inside a py list to conver the cursor object into a proper list
+    # wrapping find method inside a py list to 
+    # convert the cursor object into a proper list
     tasks = list(mongo.db.tasks.find())
     return render_template("tasks.html", tasks=tasks)
 
@@ -148,6 +149,22 @@ def delete_task(task_id):
 def get_categories():
     categories = list(mongo.db.categories.find().sort("category_name", 1))
     return render_template("categories.html", categories=categories)
+
+
+@app.route("/add_categories", methods=["GET", "POST"])
+def add_categories():
+    if request.method == "POST":
+        # create dictionary to be inserted to the db
+        # And store it on a variable called category
+        category = {
+            "category_name": request.form.get("category_name")
+        }
+        mongo.db.categories.insert_one(category)
+        flash("New Category Added")
+        # redirect the user to the pg once form posted to db
+        return redirect(url_for("get_categories"))
+# this is the get method
+    return render_template("add_categories.html")
 
 
 if __name__ == "__main__":
